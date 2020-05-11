@@ -3,6 +3,7 @@
 // doing something wrong here or not.
 describe.skip('Backup', () => {
     beforeEach(() => {
+        cy.task('stopEmu');
         // note for future 2.1.4, on load_device results in device without backup.
         // we will want to have newer firmware here later, it will require implementing needs_backup to task('setupEmu')
         cy.task('startEmu', { version: '2.1.4', wipe: true });

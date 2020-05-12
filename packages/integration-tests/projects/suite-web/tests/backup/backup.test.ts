@@ -1,11 +1,10 @@
 // backup tests are first in order and also fail in most cases, try to skip them for a while 
 // and see if tests that are second will display the same behavior. I need to find out if I am 
 // doing something wrong here or not.
-describe.skip('Backup', () => {
+describe('Backup', () => {
     beforeEach(() => {
+        Cypress.currentTest.retries(2)
         cy.task('stopEmu');
-        // note for future 2.1.4, on load_device results in device without backup.
-        // we will want to have newer firmware here later, it will require implementing needs_backup to task('setupEmu')
         cy.task('startEmu', { wipe: true });
         cy.task('setupEmu', { needs_backup: true });
 
@@ -15,6 +14,7 @@ describe.skip('Backup', () => {
     });
 
     it('Successful backup happy path', () => {
+
         // access from notification
         cy.getTestElement('@notification/no-backup/button').click();
         
@@ -47,6 +47,8 @@ describe.skip('Backup', () => {
     });
 
     it('Backup failed', () => {
+        Cypress.currentTest.retries(2)
+
         cy.getTestElement('@notification/no-backup/button').click();
         cy.getTestElement('@backup/check-item/understands-what-seed-is').click();
         cy.getTestElement('@backup/check-item/has-enough-time').click();
@@ -71,6 +73,7 @@ describe.skip('Backup', () => {
 
 
     it('User is doing backup with device A -> disconnects device A -> connects device B with backup already finished', () => {
+        
         cy.getTestElement('@notification/no-backup/button').click();
         cy.getTestElement('@backup/check-item/has-enough-time').click();
         cy.task('stopEmu');

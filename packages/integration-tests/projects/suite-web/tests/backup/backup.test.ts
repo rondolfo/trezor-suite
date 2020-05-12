@@ -3,7 +3,7 @@
 // doing something wrong here or not.
 describe('Backup', () => {
     beforeEach(() => {
-        Cypress.currentTest.retries(2)
+        Cypress.currentTest.retries(3)
         cy.task('stopEmu');
         cy.task('startEmu', { wipe: true });
         cy.task('setupEmu', { needs_backup: true });
@@ -14,10 +14,9 @@ describe('Backup', () => {
     });
 
     it('Successful backup happy path', () => {
-
         // access from notification
         cy.getTestElement('@notification/no-backup/button').click();
-        
+
         cy.getTestElement('@backup').matchImageSnapshot('backup')
         
         cy.getTestElement('@backup/check-item/understands-what-seed-is').click();
@@ -47,8 +46,6 @@ describe('Backup', () => {
     });
 
     it('Backup failed', () => {
-        Cypress.currentTest.retries(2)
-
         cy.getTestElement('@notification/no-backup/button').click();
         cy.getTestElement('@backup/check-item/understands-what-seed-is').click();
         cy.getTestElement('@backup/check-item/has-enough-time').click();
@@ -73,7 +70,6 @@ describe('Backup', () => {
 
 
     it('User is doing backup with device A -> disconnects device A -> connects device B with backup already finished', () => {
-        
         cy.getTestElement('@notification/no-backup/button').click();
         cy.getTestElement('@backup/check-item/has-enough-time').click();
         cy.task('stopEmu');

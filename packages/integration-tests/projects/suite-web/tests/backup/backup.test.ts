@@ -3,7 +3,7 @@
 // doing something wrong here or not.
 describe('Backup', () => {
     beforeEach(() => {
-        Cypress.currentTest.retries(3)
+        // Cypress.currentTest.retries(3)
         cy.task('stopEmu');
         cy.task('startEmu', { wipe: true });
         cy.task('setupEmu', { needs_backup: true });

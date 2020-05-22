@@ -12,7 +12,7 @@ const Wrapper = styled.div`
 const StyledSelect = styled(Select)``;
 
 const options = [
-    { value: 'RECIPIENT', label: <Translation id="TR_RECIPIENT" />, 'data-test': 'recipient' },
+    { value: 'RECIPIENT', label: <Translation id="TR_RECIPIENT" /> },
 ];
 
 interface ComponentProps {

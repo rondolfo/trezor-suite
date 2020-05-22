@@ -171,6 +171,7 @@ const getAccountState = () => (dispatch: Dispatch, getState: GetState): State =>
         };
     }
 
+    console.warn('does not exist');
     return {
         status: 'exception',
         loader: 'account-not-exists',
@@ -207,6 +208,7 @@ export const getStateForAction = (action: Action) => (dispatch: Dispatch, getSta
 
     // get new state
     const newState = dispatch(getAccountState());
+    console.warn('newState', newState);
     if (!newState) return;
 
     // find differences

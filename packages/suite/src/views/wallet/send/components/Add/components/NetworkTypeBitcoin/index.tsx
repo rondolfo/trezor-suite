@@ -11,7 +11,9 @@ const Wrapper = styled.div`
 
 const StyledSelect = styled(Select)``;
 
-const options = [{ value: 'RECIPIENT', label: <Translation id="TR_RECIPIENT" /> }];
+const options = [
+    { value: 'RECIPIENT', label: <Translation id="TR_RECIPIENT" />, 'data-test': 'recipient' },
+];
 
 interface ComponentProps {
     addRecipient: Props['sendFormActionsBitcoin']['addRecipient'];
@@ -30,6 +32,7 @@ export default (props: ComponentProps) => (
                 }
             }}
             options={options}
+            data-test="@send/add-select"
         />
     </Wrapper>
 );

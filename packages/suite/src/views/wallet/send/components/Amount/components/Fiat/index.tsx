@@ -51,6 +51,7 @@ export default (props: Props) => (
                 }
                 value={props.localCurrency}
                 options={FIAT.currencies.map((currency: string) => getCurrencyOptions(currency))}
+                data-test="@send/fiat-select"
             />
         </SelectWrapper>
     </Wrapper>

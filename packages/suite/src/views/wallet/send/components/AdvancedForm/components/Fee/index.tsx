@@ -175,6 +175,7 @@ export default ({ sendFormActions, send, account, settings, fiat }: Props) => {
                             )}
                         </OptionWrapper>
                     )}
+                    data-test="@send/fee-select"
                 />
             </Row>
             {networkType !== 'ethereum' && selectedFee.label === 'custom' && (

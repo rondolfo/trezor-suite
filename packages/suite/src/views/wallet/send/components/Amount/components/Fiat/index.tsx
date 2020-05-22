@@ -40,6 +40,7 @@ export default (props: Props) => (
             onChange={e =>
                 props.sendFormActions.handleFiatInputChange(props.outputId, e.target.value)
             }
+            data-test={`@send/output-${props.outputId}/fiat-input`}
         />
         <SelectWrapper>
             <Select

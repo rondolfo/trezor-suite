@@ -1,4 +1,4 @@
-// const validBech32Addr = 'bc1q5f2lvs7t29wv8nwssse6a4f6099sc3nagchqyc';
+const validBech32Addr = 'bc1q5f2lvs7t29wv8nwssse6a4f6099sc3nagchqyc';
 
 const account = {
   "deviceState": "mvbu1Gdy8SUjTenqerxUaZyYjmveZvt33q@355C817510C0EABF2F147145:undefined",
@@ -105,19 +105,20 @@ const account = {
 
 describe('Send form', () => {
     beforeEach(() => {
-        cy.viewport(1024, 768).resetDb();
+        cy.viewport(1224, 768).resetDb();
         cy.task('startEmu', { wipe: true });
         cy.task('setupEmu');
         cy.visit('/wallet/send#/btc/2/segwit');
         cy.passThroughInitialRun();
+
         // feed account with real utxo
         cy
-        .window()
-        .its('store')
-        .invoke('dispatch', {
-            type: '@account/create',
-            payload: account,
-        });
+          .window()
+          .its('store')
+          .invoke('dispatch', {
+              type: '@account/create',
+              payload: account,
+          });
 
         // wait until discovery is completed
         cy.window().its('store').invoke('getState').should((store) => {
@@ -126,34 +127,30 @@ describe('Send form', () => {
         
         // fake finish discovery (there is one added account extra causes discovery to appear uninished otherwise)
         cy
-        .window()
-        .its('store')
-        .invoke('dispatch', {
-            type: '@discovery/complete',
-            payload: {},
-        });
+          .window()
+          .its('store')
+          .invoke('dispatch', {
+              type: '@discovery/complete',
+              payload: {},
+          });
     });
 
-    // todo: maybe bug in sendmax - typing into input causes send max not enough funds?
-    it.skip('send max', () => {
-        // cy.getTestElement('@send/output-0/address-input').type('a');
-        cy.getTestElement('@send/output-0/send-max-button').click();
-        cy.getTestElement('@send/output-0/amount-input').should('have.value', '0.00360197');
-        cy.getTestElement('@send/advanced-toggle').click();
-        cy.getTestElement('@send/fee-select/input').click();
-        cy.getTestElement('@send/fee-select/option/low').click();
+    it('invalid address should not block set send max', () => {
+        cy.getTestElement('@send/output-0/address-input').type('invalidish');
+        cy.getTestElement('@send/output-0/enable-send-max-button').click();
+        cy.getTestElement('@send/output-0/amount-input', { timeout: 1000 }).should('have.value', '0.00360197');
     });
 
-    // todo: maybe bug in changing fiat, crypto value is 0.00000001, changing fiat changes it to 1e-7
-    it.skip('fiat recalculation', () => {
-        cy.getTestElement('@send/output-0/address-input').type('a');
+    it('fiat recalculation', () => {
         cy.getTestElement('@send/output-0/amount-input').type('0.00000001');
         cy.getTestElement('@send/fiat-select/input').click();
-        cy.getTestElement('@send/fiat-select/option/CZK').click({ force: true });
+        cy.getTestElement('@send/fiat-select/option/czk').click({ force: true });
+
+        cy.getTestElement('@send/output-0/amount-input', { timeout: 1000 }).should('not.have.value', '1e-8');
     });
 
     it('clear form', () => {
-      cy.getTestElement('@send/output-0/send-max-button').click();
+      cy.getTestElement('@send/output-0/enable-send-max-button').click();
       cy.getTestElement('@send/output-0/amount-input').should('have.value', '0.00360197');
       
       cy.getTestElement('@send/add-select/input').click();
@@ -174,5 +171,69 @@ describe('Send form', () => {
       cy.getTestElement('@send/output-0/address-input').should('have.value', '');
       cy.getTestElement('@send/output-0/amount-input').should('have.value', '');
     })
+
+    it('send max - should always recalculate according to selected fee level and never show "not enough funds"', () => {
+      cy.log('toggle send max and check value of default fee level');
+      cy.getTestElement('@send/advanced-toggle').click();
+      cy.getTestElement('@send/output-0/enable-send-max-button').click();
+      cy.getTestElement('@send/output-0/amount-input').should('have.value', '0.00360197');
+      cy.get('body').should('not.contain', 'Not enough funds')
+      
+      cy.log('set fee level to low and check that amount increased');
+      cy.getTestElement('@send/fee-select/input').click();
+      cy.getTestElement('@send/fee-select/option/low').click();
+      cy.getTestElement('@send/output-0/amount-input').should('have.value', '0.0049593');
+      cy.get('body').should('not.contain', 'Not enough funds')
+
+      cy.log('set fee level to low and check that amount decreased, also not enough funds should not appear');
+      cy.getTestElement('@send/fee-select/input').click({ force: true });
+      cy.getTestElement('@send/fee-select/option/high').click();
+      cy.getTestElement('@send/output-0/amount-input').should('have.value', '0.00353307');
+      cy.wait(100);
+      cy.get('body', { timeout: 1000}).should('not.contain', 'Not enough funds')
+
+  
+    });
+
+    it('send max - focus into amount input should reset set max', () => {
+      cy.getTestElement('@send/output-0/enable-send-max-button').click();
+      cy.getTestElement('@send/output-0/disable-send-max-button');
+      cy.getTestElement('@send/output-0/amount-input').focus();
+      cy.getTestElement('@send/output-0/enable-send-max-button', { timeout: 1000 });
+    })
+
+    it('send max - focus into fiat input should reset set max', () => {
+      cy.getTestElement('@send/output-0/enable-send-max-button').click();
+      cy.getTestElement('@send/output-0/disable-send-max-button');
+      cy.getTestElement('@send/output-0/fiat-input').focus();
+      cy.getTestElement('@send/output-0/enable-send-max-button', { timeout: 1000 });
+    })
+
+    it('address - should validate correctly', () => {
+      cy.getTestElement('@send/output-0/address-input').type(validBech32Addr[0]);
+      cy.get('body').should('contain', 'Address is not valid');
+      
+      // note for debugging: validation really fails if you type address letters in quick succession
+      // reproducible on localhost as well, just type in two last letters quickly, address is valid
+      // but form remains in error state
+      cy.getTestElement('@send/output-0/address-input').type(validBech32Addr.substr(1));
+      cy.get('body').should('contain', 'Account #1');
+    });
+
+    it('send form happy path', () => {
+      // check here, longer delays between single key presses and validation works as expected
+      cy.getTestElement('@send/output-0/address-input').type(validBech32Addr, { delay: 70 });
+      cy.get('body').should('contain', 'Account #1');
+      cy.getTestElement('@send/output-0/enable-send-max-button').click();
+      cy.getTestElement('@send/review-button').click();
+    })
+
+
+    // note: this probably also makes tests flaky as send for may reset as result of unexpected reconnect
+    it.skip('form should not reset on blockchain reconnect', () => {});
+    it.skip('form should not reset on device reconnect', () => {});
+
+
+
 });
 

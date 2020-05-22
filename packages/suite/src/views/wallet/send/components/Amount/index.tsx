@@ -136,7 +136,9 @@ export default ({ sendFormActions, output, selectedAccount, send }: Props) => {
                         iconSize: 15,
                         onClick: () => sendFormActions.setMax(id),
                         text: <Translation id="TR_SEND_SEND_MAX" />,
-                        'data-test': `@send/output-${id}/send-max-button`,
+                        'data-test': `@send/output-${id}/${
+                            setMaxActivated ? 'disable' : 'enable'
+                        }-send-max-button`,
                     }}
                     align="right"
                     value={value || ''}
@@ -149,6 +151,7 @@ export default ({ sendFormActions, output, selectedAccount, send }: Props) => {
                         symbol,
                         customFee.error,
                     )}
+                    data-test={`@send/output-${id}/amount-input`}
                 />
                 {tokenBalance && (
                     <TokenBalance>

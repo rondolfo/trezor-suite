@@ -171,7 +171,9 @@ export default ({ sendFormActions, send, account, settings, fiat }: Props) => {
                         <OptionWrapper>
                             <OptionLabel>{capitalizeFirstLetter(option.label)} </OptionLabel>
                             {option.feePerUnit !== '0' && (
-                                <OptionValue>{getValue(networkType, option, symbol)}</OptionValue>
+                                <OptionValue data-test={`@send/fee-select/option/${option.label}`}>
+                                    {getValue(networkType, option, symbol)}
+                                </OptionValue>
                             )}
                         </OptionWrapper>
                     )}

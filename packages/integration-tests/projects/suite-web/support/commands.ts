@@ -4,7 +4,7 @@
 import TrezorConnect, { Device, Features } from 'trezor-connect';
 import { Store, AppState } from '@suite-types';
 
-import { onboardingShouldLoad, dashboardShouldLoad, discoveryShouldFinish } from './utils/assertions';
+import { onboardingShouldLoad, dashboardShouldLoad } from './utils/assertions';
 import { connectBootloaderDevice, connectDevice, changeDevice } from './utils/device';
 import { getTestElement, getConfirmActionOnDeviceModal } from './utils/selectors';
 import { resetDb, setState } from './utils/test-env';
@@ -67,7 +67,6 @@ Cypress.Commands.add('changeDevice', changeDevice);
 // assertion helpers
 Cypress.Commands.add('onboardingShouldLoad', onboardingShouldLoad);
 Cypress.Commands.add('dashboardShouldLoad', dashboardShouldLoad);
-Cypress.Commands.add('discoveryShouldFinish', discoveryShouldFinish);
 
 // selector helpers
 Cypress.Commands.add('getTestElement', getTestElement);

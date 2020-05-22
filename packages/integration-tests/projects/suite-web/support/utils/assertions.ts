@@ -9,7 +9,3 @@ export const onboardingShouldLoad = () => {
 export const dashboardShouldLoad = () => {
     return cy.getTestElement('@dashboard/index').should('be.visible');
 };
-
-export const discoveryShouldFinish = () => {
-    return cy.getTestElement('@dashboard/graph').should('be.visible');
-}
